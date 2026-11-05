@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAWZPAY - Digital Wallet</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+ font-family:Arial,sans-serif;
+ background:#080f20;color:white;
+ min-height:100vh;padding:20px;
+}
+.container{max-width:460px;margin:auto}
+.header{display:flex;align-items:center;gap:12px;margin:15px 0 25px}
+.logo{
+ width:45px;height:45px;border-radius:14px;
+ background:#2563eb;display:grid;place-items:center;
+ font-size:24px;font-weight:bold
+}
+.header h2{letter-spacing:1px}
+.card{
+ background:linear-gradient(135deg,#1559db,#12358c);
+ padding:25px;border-radius:22px;
+ box-shadow:0 12px 35px #0005;
+}
+.muted{color:#c8d8ff;font-size:13px}
+.balance{font-size:32px;font-weight:bold;margin:12px 0 22px}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0}
+.action{
+ background:#17243c;border:1px solid #293b59;
+ border-radius:15px;padding:17px 5px;text-align:center;
+ color:white;font-size:12px
+}
+.action span{display:block;font-size:23px;margin-bottom:8px}
+.section{margin:25px 0 12px;font-size:17px}
+.transaction{
+ background:#141f34;padding:16px;border-radius:14px;
+ display:flex;justify-content:space-between;margin-bottom:10px
+}
+.transaction small{display:block;color:#9aacc7;margin-top:5px}
+.plus{color:#4ade80}
+.note{color:#91a1bb;font-size:12px;text-align:center;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="container">
+ <div class="header">
+  <div class="logo">N</div>
+  <h2>NAWZPAY</h2>
+ </div>
+
+ <div class="card">
+  <p class="muted">TOTAL SALDO</p>
+  <div class="balance">Rp 0</div>
+  <p class="muted">Akun Demo NAWZPAY</p>
+ </div>
+
+ <div class="actions">
+  <div class="action"><span>＋</span>Top Up</div>
+  <div class="action"><span>➤</span>Transfer</div>
+  <div class="action"><span>▦</span>QRIS</div>
+  <div class="action"><span>◷</span>Riwayat</div>
+ </div>
+
+ <h3 class="section">Transaksi Terakhir</h3>
+ <div class="transaction">
+  <div>Belum ada transaksi<small>Aktivitas kamu akan muncul di sini</small></div>
+  <div>—</div>
+ </div>
+
+ <p class="note">NAWZPAY © 2026 · Tampilan Demo</p>
+</div>
+</body>
+</html>
