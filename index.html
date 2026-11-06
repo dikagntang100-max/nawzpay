@@ -1,75 +1,206 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NAWZPAY - Digital Wallet</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box}
 body{
- font-family:Arial,sans-serif;
- background:#080f20;color:white;
- min-height:100vh;padding:20px;
+ margin:0;background:#080f20;color:white;
+ font-family:Arial,sans-serif;padding:20px;
 }
-.container{max-width:460px;margin:auto}
-.header{display:flex;align-items:center;gap:12px;margin:15px 0 25px}
-.logo{
- width:45px;height:45px;border-radius:14px;
- background:#2563eb;display:grid;place-items:center;
- font-size:24px;font-weight:bold
+.container{max-width:430px;margin:25px auto}
+.logo{text-align:center;font-size:30px;font-weight:bold;color:#60a5fa;margin-bottom:25px}
+.card{background:#14213a;padding:23px;border-radius:20px;margin-bottom:18px}
+h2{text-align:center}
+input{
+ width:100%;padding:15px;margin:9px 0;
+ background:#0b1528;border:1px solid #334766;
+ border-radius:10px;color:white;font-size:15px;
 }
-.header h2{letter-spacing:1px}
-.card{
- background:linear-gradient(135deg,#1559db,#12358c);
- padding:25px;border-radius:22px;
- box-shadow:0 12px 35px #0005;
+button{
+ width:100%;padding:15px;border:0;border-radius:10px;
+ background:#2563eb;color:white;font-weight:bold;
+ font-size:15px;margin-top:10px;
 }
-.muted{color:#c8d8ff;font-size:13px}
-.balance{font-size:32px;font-weight:bold;margin:12px 0 22px}
-.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:22px 0}
-.action{
- background:#17243c;border:1px solid #293b59;
- border-radius:15px;padding:17px 5px;text-align:center;
- color:white;font-size:12px
-}
-.action span{display:block;font-size:23px;margin-bottom:8px}
-.section{margin:25px 0 12px;font-size:17px}
-.transaction{
- background:#141f34;padding:16px;border-radius:14px;
- display:flex;justify-content:space-between;margin-bottom:10px
-}
-.transaction small{display:block;color:#9aacc7;margin-top:5px}
-.plus{color:#4ade80}
-.note{color:#91a1bb;font-size:12px;text-align:center;margin-top:30px}
+.secondary{background:#26364d}
+.hidden{display:none}
+small{color:#a9bad3}
+.balance{font-size:30px;font-weight:bold;margin:15px 0}
+.menu{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.item{background:#26364d;padding:20px;border-radius:13px;text-align:center}
+#message{text-align:center;color:#60a5fa;margin-top:15px;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
 <div class="container">
- <div class="header">
-  <div class="logo">N</div>
-  <h2>NAWZPAY</h2>
+
+<div class="logo">◈ NAWZPAY</div>
+
+<div id="auth">
+ <div class="card">
+  <h2 id="formTitle">Login NAWZPAY</h2>
+
+  <div id="nameBox" class="hidden">
+   <input id="name" placeholder="Nama lengkap">
+  </div>
+
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <button id="submitBtn" onclick="submitAuth()">LOGIN</button>
+
+  <button class="secondary" onclick="toggleMode()" id="switchBtn">
+   Belum punya akun? Daftar
+  </button>
+
+  <p id="message"></p>
+ </div>
+</div>
+
+<div id="dashboard" class="hidden">
+
+ <div class="card">
+  <small>SELAMAT DATANG</small>
+  <h2 id="userName">Pengguna</h2>
+  <small>SALDO DEMO</small>
+  <div class="balance">Rp 0</div>
+  <small>Saldo belum diaktifkan</small>
  </div>
 
  <div class="card">
-  <p class="muted">TOTAL SALDO</p>
-  <div class="balance">Rp 0</div>
-  <p class="muted">Akun Demo NAWZPAY</p>
+  <h3>Menu Utama</h3>
+  <div class="menu">
+   <div class="item">➕<p>Top Up</p></div>
+   <div class="item">➤<p>Transfer</p></div>
+   <div class="item">▦<p>QRIS</p></div>
+   <div class="item">◷<p>Riwayat</p></div>
+  </div>
+  <button class="secondary" onclick="logout()">LOGOUT</button>
  </div>
 
- <div class="actions">
-  <div class="action"><span>＋</span>Top Up</div>
-  <div class="action"><span>➤</span>Transfer</div>
-  <div class="action"><span>▦</span>QRIS</div>
-  <div class="action"><span>◷</span>Riwayat</div>
- </div>
-
- <h3 class="section">Transaksi Terakhir</h3>
- <div class="transaction">
-  <div>Belum ada transaksi<small>Aktivitas kamu akan muncul di sini</small></div>
-  <div>—</div>
- </div>
-
- <p class="note">NAWZPAY © 2026 · Tampilan Demo</p>
+ <p style="text-align:center;color:#8295b4;font-size:12px">
+ NAWZPAY © 2026
+ </p>
 </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://tgfirpvkzgwzwzyxhfbr.supabase.co/rest/v1/";
+const SUPABASE_KEY = "sb_publishable_ENHcI_Bc15oI97n6e5X3WA_yJya7rGK";
+
+const client = window.supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
+
+let registerMode = false;
+
+function toggleMode(){
+ registerMode = !registerMode;
+
+ document.getElementById("formTitle").textContent =
+ registerMode ? "Daftar NAWZPAY" : "Login NAWZPAY";
+
+ document.getElementById("submitBtn").textContent =
+ registerMode ? "DAFTAR SEKARANG" : "LOGIN";
+
+ document.getElementById("switchBtn").textContent =
+ registerMode ? "Sudah punya akun? Login" : "Belum punya akun? Daftar";
+
+ document.getElementById("nameBox").classList.toggle("hidden",!registerMode);
+ document.getElementById("message").textContent = "";
+}
+
+async function submitAuth(){
+ const email = document.getElementById("email").value.trim();
+ const password = document.getElementById("password").value;
+ const name = document.getElementById("name").value.trim();
+ const msg = document.getElementById("message");
+ const btn = document.getElementById("submitBtn");
+
+ if(!email || !password){
+  msg.textContent = "Isi email dan password!";
+  return;
+ }
+
+ if(password.length < 8){
+  msg.textContent = "Password minimal 8 karakter!";
+  return;
+ }
+
+ if(registerMode && !name){
+  msg.textContent = "Isi nama lengkap!";
+  return;
+ }
+
+ btn.disabled = true;
+ msg.textContent = "Memproses...";
+
+ try{
+  let result;
+
+  if(registerMode){
+   result = await client.auth.signUp({
+    email,
+    password,
+    options:{data:{display_name:name}}
+   });
+  }else{
+   result = await client.auth.signInWithPassword({
+    email,password
+   });
+  }
+
+  if(result.error) throw result.error;
+
+  if(registerMode && !result.data.session){
+   msg.textContent = "Pendaftaran berhasil. Periksa email untuk verifikasi.";
+   return;
+  }
+
+  await showDashboard(result.data.user);
+
+ }catch(error){
+  msg.textContent = error.message;
+ }finally{
+  btn.disabled = false;
+ }
+}
+
+async function showDashboard(user){
+ if(!user)return;
+
+ document.getElementById("auth").classList.add("hidden");
+ document.getElementById("dashboard").classList.remove("hidden");
+
+ document.getElementById("userName").textContent =
+ user.user_metadata?.display_name || user.email;
+}
+
+async function logout(){
+ await client.auth.signOut();
+ document.getElementById("dashboard").classList.add("hidden");
+ document.getElementById("auth").classList.remove("hidden");
+}
+
+async function init(){
+ const {data,error} = await client.auth.getSession();
+
+ if(error){
+  document.getElementById("message").textContent = error.message;
+  return;
+ }
+
+ if(data.session){
+  await showDashboard(data.session.user);
+ }
+}
+
+init();
+</script>
 </body>
 </html>
